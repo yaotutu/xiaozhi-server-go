@@ -165,7 +165,7 @@ func NewConnectionHandler(
 		talkRound: 0,
 
 		serverAudioFormat:        "opus", // 默认使用Opus格式
-		serverAudioSampleRate:    24000,
+		serverAudioSampleRate:    16000, // 修改为16000以匹配客户端期望
 		serverAudioChannels:      1,
 		serverAudioFrameDuration: 60,
 
@@ -350,8 +350,11 @@ func (h *ConnectionHandler) processClientAudioMessagesCoroutine() {
 			if h.closeAfterChat {
 				continue
 			}
+			h.LogInfo(fmt.Sprintf("处理音频数据: %d bytes", len(audioData)))
 			if err := h.providers.asr.AddAudio(audioData); err != nil {
-				h.LogError(fmt.Sprintf("处理音频数据失败: %v", err))
+				h.LogError(fmt.Sprintf("ASR处理音频数据失败: %v", err))
+			} else {
+				h.LogInfo("音频数据已成功发送到ASR")
 			}
 		}
 	}

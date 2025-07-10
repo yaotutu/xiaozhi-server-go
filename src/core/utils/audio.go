@@ -30,7 +30,7 @@ type OpusDecoderConfig struct {
 func NewOpusDecoder(config *OpusDecoderConfig) (*OpusDecoder, error) {
 	if config == nil {
 		config = &OpusDecoderConfig{
-			SampleRate:  24000, // 默认使用24kHz采样率
+			SampleRate:  16000, // 默认使用16kHz采样率，与协议保持一致
 			MaxChannels: 1,     // 默认单通道
 		}
 	}
@@ -329,8 +329,8 @@ func AudioToPCMData(audioFile string) ([][]byte, float64, error) {
 
 	mp3SampleRate := decoder.SampleRate()
 	//fmt.Println("AudioToPCMData 原始MP3采样率:", mp3SampleRate)
-	// 目标采样率设为24kHz
-	targetSampleRate := 24000
+	// 目标采样率设为16kHz (匹配客户端期望)
+	targetSampleRate := 16000
 
 	// decoder.Length() 返回解码后的PCM数据总字节数 (16-bit little-endian stereo)
 	pcmBytes := make([]byte, decoder.Length())
@@ -518,7 +518,7 @@ func PCMToOpusData(pcmData []byte, sampleRate int, channels int) ([]byte, error)
 	encoder, err := opus.CreateOpusEncoder(&opus.OpusEncoderConfig{
 		SampleRate:    sampleRate,
 		MaxChannels:   channels,
-		Application:   opus.AppVoIP,
+		Application:   opus.AppAudio,
 		FrameDuration: opus.Framesize60Ms, // 使用60ms帧长
 	})
 	if err != nil {
@@ -615,7 +615,7 @@ func MP3ToOpusData(audioFile string) ([]byte, error) {
 	encoder, err := opus.CreateOpusEncoder(&opus.OpusEncoderConfig{
 		SampleRate:    sampleRate,
 		MaxChannels:   1, // 单声道
-		Application:   opus.AppVoIP,
+		Application:   opus.AppAudio,
 		FrameDuration: opus.Framesize60Ms, // 使用60ms帧长
 	})
 	if err != nil {
@@ -662,7 +662,7 @@ func PCMSlicesToOpusData(pcmSlices [][]byte, sampleRate int, channels int, bitra
 	encoder, err := opus.CreateOpusEncoder(&opus.OpusEncoderConfig{
 		SampleRate:    sampleRate,
 		MaxChannels:   channels,
-		Application:   opus.AppVoIP,
+		Application:   opus.AppAudio,
 		FrameDuration: opus.Framesize60Ms, // 使用60ms帧长
 	})
 	if err != nil {

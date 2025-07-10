@@ -113,7 +113,7 @@ func NewProvider(config *asr.Config, deleteFile bool, logger *utils.Logger) (*Pr
 		accessToken:   accessToken,
 		outputDir:     outputDir,
 		host:          "openspeech.bytedance.com",
-		wsURL:         "wss://openspeech.bytedance.com/api/v3/sauc/bigmodel_nostream",
+		wsURL:         "wss://openspeech.bytedance.com/api/v3/sauc/bigmodel",
 		chunkDuration: 200, // 固定使用200ms分片
 		connectID:     connectID,
 		logger:        logger, // 使用简单的logger

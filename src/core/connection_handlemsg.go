@@ -18,9 +18,11 @@ func (h *ConnectionHandler) handleMessage(messageType int, message []byte) error
 		h.clientTextQueue <- string(message)
 		return nil
 	case 2: // 二进制消息（音频数据）
+		h.logger.Info(fmt.Sprintf("收到音频数据: %d bytes, 格式: %s", len(message), h.clientAudioFormat))
 		if h.clientAudioFormat == "pcm" {
 			// 直接将PCM数据放入队列
 			h.clientAudioQueue <- message
+			h.logger.Info("PCM音频数据已放入队列")
 		} else if h.clientAudioFormat == "opus" {
 			// 检查是否初始化了opus解码器
 			if h.opusDecoder != nil {
@@ -32,13 +34,17 @@ func (h *ConnectionHandler) handleMessage(messageType int, message []byte) error
 					h.clientAudioQueue <- message
 				} else {
 					// 解码成功，将PCM数据放入队列
-					h.logger.Debug(fmt.Sprintf("Opus解码成功: %d bytes -> %d bytes", len(message), len(decodedData)))
+					h.logger.Info(fmt.Sprintf("Opus解码成功: %d bytes -> %d bytes", len(message), len(decodedData)))
 					if len(decodedData) > 0 {
 						h.clientAudioQueue <- decodedData
+						h.logger.Info("解码后的PCM数据已放入队列")
+					} else {
+						h.logger.Warn("Opus解码后数据为空，丢弃")
 					}
 				}
 			} else {
 				// 没有解码器，直接传递原始数据
+				h.logger.Warn("Opus解码器未初始化，直接传递原始数据")
 				h.clientAudioQueue <- message
 			}
 		}
@@ -139,7 +145,7 @@ func (h *ConnectionHandler) handleHelloMessage(msgMap map[string]interface{}) er
 	h.closeOpusDecoder()
 	// 初始化opus解码器
 	opusDecoder, err := utils.NewOpusDecoder(&utils.OpusDecoderConfig{
-		SampleRate:  h.clientAudioSampleRate, // 客户端使用24kHz采样率
+		SampleRate:  h.clientAudioSampleRate, // 客户端使用16kHz采样率
 		MaxChannels: h.clientAudioChannels,   // 单声道音频
 	})
 	if err != nil {

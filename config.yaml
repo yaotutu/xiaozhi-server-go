@@ -27,7 +27,7 @@ log:
   # 设置控制台输出的日志格式，时间、日志级别、标签、消息
   log_format: "{time:YYYY-MM-DD HH:mm:ss} - {level} - {message}"
   # 设置日志等级：INFO、DEBUG
-  log_level: INFO
+  log_level: DEBUG
   # 设置日志路径
   log_dir: logs
   # 设置日志文件
@@ -80,8 +80,8 @@ selected_module:
 ASR:
   DoubaoASR:
     type: doubao
-    appid: "你的appid"
-    access_token: 你的access_token
+    appid: "6622703946"
+    access_token: qLMBUJxucwUU2rIjO7zWgv9mGMVox6ZY
     output_dir: tmp/
 
   GoSherpaASR:
